@@ -14,6 +14,9 @@ use Symfony\Component\DependencyInjection\Reference;
 class BunnyCompilerPass implements CompilerPassInterface
 {
 
+	const TAG_NAME_PRODUCER = 'bunny.producer';
+	const TAG_NAME_CONSUMER = 'bunny.consumer';
+
 	/** @var string */
 	private $configKey;
 
@@ -71,14 +74,7 @@ class BunnyCompilerPass implements CompilerPassInterface
 
 		$consumers = [];
 		$producers = [];
-		foreach ($container->getDefinitions() as $serviceId => $definition) {
-			if ($definition->isAbstract() ||
-				!$definition->isPublic() ||
-				!$definition->getClass()
-			) {
-				continue;
-			}
-
+		foreach ($this->getCandidateServices($container, $config) as $serviceId => $definition) {
 			$className = $parameterBag->resolveValue($definition->getClass());
 
 			if (!class_exists($className)) {
@@ -193,6 +189,34 @@ class BunnyCompilerPass implements CompilerPassInterface
 			new Reference($this->managerServiceId),
 			$producers,
 		]));
+	}
+
+	private function getCandidateServices(ContainerBuilder $container, array $config)
+	{
+		$candidates = [];
+
+		if ($config['discovery_mode'] === 'tags') {
+			foreach ([self::TAG_NAME_PRODUCER, self::TAG_NAME_CONSUMER] as $tagName) {
+				foreach ($container->findTaggedServiceIds($tagName) as $serviceId => $tag) {
+					$candidates[$serviceId] = $container->getDefinition($serviceId);
+				}
+			}
+
+			return $candidates;
+		}
+
+		foreach ($container->getDefinitions() as $serviceId => $definition) {
+			if ($definition->isAbstract() ||
+				!$definition->isPublic() ||
+				!$definition->getClass()
+			) {
+				continue;
+			}
+
+			$candidates[$serviceId] = $definition;
+		}
+
+		return $candidates;
 	}
 
 }

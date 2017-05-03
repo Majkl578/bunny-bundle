@@ -27,6 +27,11 @@ class SkrzBunnyExtension extends Extension implements ConfigurationInterface
 		$rootNode->children()->scalarNode("user")->defaultValue("guest");
 		$rootNode->children()->scalarNode("password")->defaultValue("guest");
 		$rootNode->children()->scalarNode("heartbeat")->defaultValue(60);
+		$rootNode->children()->scalarNode("discovery_mode")
+			->defaultValue("scan")
+			->validate()
+			->ifNotInArray(["scan", "tags"])
+			->thenInvalid("Discovery mode could only be 'scan' or 'tags'.");
 
 		/** @var ArrayNodeDefinition $exchangesNode */
 		$exchangesNode = $rootNode->children()->arrayNode("exchanges")->useAttributeAsKey("name")->normalizeKeys(false)->defaultValue([])->prototype("array");
