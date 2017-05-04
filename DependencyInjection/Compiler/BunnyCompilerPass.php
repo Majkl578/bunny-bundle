@@ -83,7 +83,7 @@ class BunnyCompilerPass implements CompilerPassInterface
 
 			$rc = new \ReflectionClass($className);
 
-			if (strpos($rc->getDocComment(), "@Consumer") === false && strpos($rc->getDocComment(), "@Producer") === false) {
+			if (!preg_match('~@(?:\w+\\\\)*(?:Producer|Consumer)~s', $rc->getDocComment())) {
 				continue;
 			}
 
