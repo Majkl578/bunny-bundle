@@ -27,6 +27,8 @@ class SkrzBunnyExtension extends Extension implements ConfigurationInterface
 		$rootNode->children()->scalarNode("user")->defaultValue("guest");
 		$rootNode->children()->scalarNode("password")->defaultValue("guest");
 		$rootNode->children()->scalarNode("heartbeat")->defaultValue(60);
+		$rootNode->children()->scalarNode("connection_timeout")->defaultValue(1);
+		$rootNode->children()->scalarNode("read_write_timeout")->defaultNull();
 		$rootNode->children()->scalarNode("discovery_mode")
 			->defaultValue("scan")
 			->validate()

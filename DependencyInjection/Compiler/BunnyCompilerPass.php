@@ -162,6 +162,8 @@ class BunnyCompilerPass implements CompilerPassInterface
 			"user" => $config["user"],
 			"password" => $config["password"],
 			"heartbeat" => $config["heartbeat"],
+			"timeout" => $config["connection_timeout"],
+			"read_write_timeout" => $config["read_write_timeout"],
 		]]));
 
 		$container->setDefinition($this->managerServiceId, new Definition("Skrz\\Bundle\\BunnyBundle\\BunnyManager", [
