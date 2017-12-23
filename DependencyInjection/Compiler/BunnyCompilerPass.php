@@ -155,7 +155,7 @@ class BunnyCompilerPass implements CompilerPassInterface
 			}
 		}
 
-		$container->setDefinition($this->clientServiceId, new Definition("Bunny\\Client", [[
+		$clientDefinition = new Definition("Bunny\\Client", [[
 			"host" => $config["host"],
 			"port" => $config["port"],
 			"vhost" => $config["vhost"],
@@ -164,17 +164,22 @@ class BunnyCompilerPass implements CompilerPassInterface
 			"heartbeat" => $config["heartbeat"],
 			"timeout" => $config["connection_timeout"],
 			"read_write_timeout" => $config["read_write_timeout"],
-		]]));
+		]]);
+		$clientDefinition->setPublic(true);
+		$container->setDefinition($this->clientServiceId, $clientDefinition);
 
-		$container->setDefinition($this->managerServiceId, new Definition("Skrz\\Bundle\\BunnyBundle\\BunnyManager", [
+		$managerDefinition = new Definition("Skrz\\Bundle\\BunnyBundle\\BunnyManager", [
 			new Reference("service_container"),
 			$this->clientServiceId,
 			$config,
-		]));
+		]);
+		$managerDefinition->setPublic(true);
+		$container->setDefinition($this->managerServiceId, $managerDefinition);
 
-		$channel = new Definition("Bunny\\Channel");
-		$channel->setFactory([new Reference($this->managerServiceId), "getChannel"]);
-		$container->setDefinition($this->channelServiceId, $channel);
+		$channelDefinition = new Definition("Bunny\\Channel");
+		$channelDefinition->setFactory([new Reference($this->managerServiceId), "getChannel"]);
+		$channelDefinition->setPublic(true);
+		$container->setDefinition($this->channelServiceId, $channelDefinition);
 
 		$container->setDefinition($this->setupCommandServiceId, new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\SetupCommand", [
 			new Reference($this->managerServiceId),
