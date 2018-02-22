@@ -181,21 +181,27 @@ class BunnyCompilerPass implements CompilerPassInterface
 		$channelDefinition->setPublic(true);
 		$container->setDefinition($this->channelServiceId, $channelDefinition);
 
-		$container->setDefinition($this->setupCommandServiceId, new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\SetupCommand", [
+		$setupCommandDefinition = new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\SetupCommand", [
 			new Reference($this->managerServiceId),
-		]));
+		]);
+		$setupCommandDefinition->setPublic(true);
+		$container->setDefinition($this->setupCommandServiceId, $setupCommandDefinition);
 
-		$container->setDefinition($this->consumerCommandServiceId, new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\ConsumerCommand", [
+		$consumerCommandDefinition = new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\ConsumerCommand", [
 			new Reference("service_container"),
 			new Reference($this->managerServiceId),
 			$consumers,
-		]));
+		]);
+		$consumerCommandDefinition->setPublic(true);
+		$container->setDefinition($this->consumerCommandServiceId, $consumerCommandDefinition);
 
-		$container->setDefinition($this->producerCommandServiceId, new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\ProducerCommand", [
+		$producerCommandDefinition = new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\ProducerCommand", [
 			new Reference("service_container"),
 			new Reference($this->managerServiceId),
 			$producers,
-		]));
+		]);
+		$producerCommandDefinition->setPublic(true);
+		$container->setDefinition($this->producerCommandServiceId, $producerCommandDefinition);
 	}
 
 	private function getCandidateServices(ContainerBuilder $container, array $config)
